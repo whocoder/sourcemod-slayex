@@ -6,9 +6,9 @@ Handle SQLiteDB;
 bool useDB = true;
 
 char sQueryBuff[1024];
-char[] sInsertQuery = "INSERT INTO slays (auth) VALUES (%d);";
-char[] sUpdateQuery = ;
-char[] sSelectQuery = "SELECT amount FROM slays WHERE auth=%d;";
+char sInsertQuery[] = "INSERT INTO slays (auth) VALUES (%d);";
+char sUpdateQuery[] = "UPDATE slays SET amount=%d WHERE auth=%d";
+char sSelectQuery[] = "SELECT amount FROM slays WHERE auth=%d;";
 
 #include <ttt>
 
@@ -89,7 +89,7 @@ void CheckSlays(int client){
 		g_iPendingSlays[client] -= 1;
 		
 		if(useDB && g_bDBLoaded[client] == true){
-			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sUpdateQuery, GetSteamAccountID(client), g_iPendingSlays[client]);
+			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sUpdateQuery, g_iPendingSlays[client], GetSteamAccountID(client));
 			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientUserId(client));
 		}
 		
