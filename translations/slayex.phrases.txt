@@ -1,0 +1,18 @@
+"Phrases"
+{
+	"Pending slays left"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"Player {1} has been slayed. Remaining slays: {2}"
+	}
+	"Marked to slay"
+	{
+		"#format"	"{1:s},{2:i}"
+		"en"		"Player {1} has been marked to be slain {2} time(s)."
+	}
+	"Marked to slay by"
+	{
+		"#format"	"{1:N},{2:i},{3:N}"
+		"en"		"Player {1} has been marked to be slain {2} time(s) by {3}."
+	}
+}
