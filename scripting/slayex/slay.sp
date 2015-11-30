@@ -1,7 +1,78 @@
 int g_iSelectedTarget[MAXPLAYERS+1];
 int g_iPendingSlays[MAXPLAYERS+1];
+bool g_bDBLoaded[MAXPLAYERS+1];
+
+Handle SQLiteDB;
+bool useDB = true;
+
+char sQueryBuff[1024];
+char[] sInsertQuery = "INSERT INTO slays (auth) VALUES (%d);";
+char[] sUpdateQuery = ;
+char[] sSelectQuery = "SELECT amount FROM slays WHERE auth=%d;";
 
 #include <ttt>
+
+public void OnClientPostAdminCheck(int client){
+	if(useDB && (SQLiteDB != INVALID_HANDLE)){
+		g_bDBLoaded[client] = true;
+		Format(sQueryBuff, sizeof(sQueryBuff), "%s", sSelectQuery, GetSteamAccountID(client));
+		SQL_TQuery(SQLiteDB, GetSlays_CB, sQueryBuff, GetClientUserId(client));
+	}
+}
+
+public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
+	int client = GetClientOfUserId(userid);
+	if(TTT_IsClientValid(client)){
+		if (hndl == INVALID_HANDLE || strlen(error) > 0){
+			LogMessage("Failed to retrieve slayex slays from database, error: %s", error);
+			return;
+		}
+		
+		if(SQL_FetchRow(hndl)){
+			g_bDBLoaded[client] = true;
+			g_iPendingSlays[client] = SQL_FetchInt(hndl, 0);
+			CheckSlays(client);
+		}else{
+			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sInsertQuery, GetSteamAccountID(client));
+			SQL_TQuery(SQLiteDB, InsertUser_CB, sQueryBuff, GetClientUserId(client));
+		}
+	}
+}
+
+public InsertUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
+	int client = GetClientOfUserId(userid);
+	if(TTT_IsClientValid(client)){
+		if (hndl == INVALID_HANDLE || strlen(error) > 0){
+			LogMessage("Failed to insert slayex user into database, error: %s", error);
+			return;
+		}
+		
+		g_bDBLoaded[client] = true;
+	}
+}
+
+public UpdateUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
+	int client = GetClientOfUserId(userid);
+	if(TTT_IsClientValid(client)){
+		if (hndl == INVALID_HANDLE || strlen(error) > 0){
+			LogMessage("Failed to update slayex user in database, error: %s", error);
+			return;
+		}
+	}
+}
+
+void SetupSlayExDB(){
+	char error[255];
+	SQLiteDB = SQLite_UseDatabase("slayex", error, sizeof(error));
+	
+	if (SQLiteDB == INVALID_HANDLE)
+		useDB = false;
+	else{
+		SQL_LockDatabase(SQLiteDB);
+		SQL_FastQuery(SQLiteDB, "CREATE TABLE IF NOT EXISTS slays (auth INT PRIMARY KEY NOT NULL, amount INTEGER DEFAULT 0);");
+		SQL_UnlockDatabase(SQLiteDB);
+	}
+}
 
 public Action TTT_OnRoundStart_Pre(){
 	for(int i=1;i<=MaxClients;i++){
@@ -14,8 +85,14 @@ public Action TTT_OnRoundStart_Pre(){
 }
 
 void CheckSlays(int client){
-	if(g_iPendingSlays[client] > 0 && IsPlayerAlive(client)){
+	if(TTT_IsClientValid(client) && g_iPendingSlays[client] > 0 && IsPlayerAlive(client)){
 		g_iPendingSlays[client] -= 1;
+		
+		if(useDB && g_bDBLoaded[client] == true){
+			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sUpdateQuery, GetSteamAccountID(client), g_iPendingSlays[client]);
+			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientUserId(client));
+		}
+		
 		ForcePlayerSuicide(client);
 		
 		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", "__n", client, g_iPendingSlays[client]);

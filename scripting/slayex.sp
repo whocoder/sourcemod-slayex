@@ -41,6 +41,8 @@ public void OnPluginStart(){
 	if (LibraryExists("adminmenu") && ((topmenu = GetAdminTopMenu()) != null)){
 		OnAdminMenuReady(topmenu);
 	}
+	
+	SetupSlayExDB();
 }
 
 public void OnConfigsExecuted(){
