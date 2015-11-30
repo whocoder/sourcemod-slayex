@@ -3,12 +3,14 @@ int g_iPendingSlays[MAXPLAYERS+1];
 
 #include <ttt>
 
-public void TTT_OnRoundStart_Pre(){
+public Action TTT_OnRoundStart_Pre(){
 	for(int i=1;i<=MaxClients;i++){
 		if(TTT_IsClientValid(i)){
-			CheckSlays(client);
+			CheckSlays(i);
 		}
 	}
+	
+	return Plugin_Continue;
 }
 
 void CheckSlays(int client){
@@ -16,7 +18,7 @@ void CheckSlays(int client){
 		g_iPendingSlays[client] -= 1;
 		ForcePlayerSuicide(client);
 		
-		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", target_name, g_iPendingSlays[i]);
+		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", client, g_iPendingSlays[i]);
 	}
 }
 
@@ -86,22 +88,20 @@ public MenuHandler_Slay(Menu menu, MenuAction action, int param1, int param2){
 		}
 		else
 		{
-			g_iSelectedTarget[client] = userid;
-			Menu menu = CreateMenu(MenuHandler_Slay2);
+			g_iSelectedTarget[param1] = userid;
+			Menu menu2 = CreateMenu(MenuHandler_Slay2);
 			
-			menu.SetTitle("# of times");
-			menu.ExitBackButton = true;
+			menu2.SetTitle("# of times");
+			menu2.ExitBackButton = true;
 			
-			menu.AddItem("1", "1");
-			menu.AddItem("2", "2");
-			menu.AddItem("3", "3");
-			menu.AddItem("4", "4");
-			menu.AddItem("5", "5");
+			menu2.AddItem("1", "1");
+			menu2.AddItem("2", "2");
+			menu2.AddItem("3", "3");
+			menu2.AddItem("4", "4");
+			menu2.AddItem("5", "5");
 			
-			menu.Display(client, MENU_TIME_FOREVER);
+			menu2.Display(param1, MENU_TIME_FOREVER);
 		}
-		
-		DisplaySlayMenu(param1);
 	}
 }
 
