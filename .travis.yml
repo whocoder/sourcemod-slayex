@@ -10,6 +10,7 @@ env:
     - SCRIPTING=scripting
     - PLUGINS=plugins
     - SLAYEX=scripting/slayex
+    - TRANSLATIONS=translations
     - SOURCEMOD_MAJOR=1.7
     - SOURCEMOD_MINOR=1.7.3-git5258
     - SCRIPT=build-env/addons/sourcemod/scripting/compile.sh
@@ -42,7 +43,7 @@ script:
 
 after_success:
   - mkdir $PLUGINS
-  - cp -rv build-env/addons/sourcemod/scripting/compiled/. $PLUGINS
+  - cp -rv build-env/addons/sourcemod/scripting/compiled/. $PLUGINS $TRANSLATIONS
   - rm -r build-env
   - zip -9rq $TRAVIS_COMMIT.zip $PLUGINS
   - find $TRAVIS_COMMIT.zip -type f -exec curl --user $FTPUSER:$FTPPASS --ftp-create-dirs -T {} ftp://$FTPPATH/whocodes/public/git-build/slayex/{} \;
