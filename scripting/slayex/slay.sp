@@ -18,7 +18,7 @@ void CheckSlays(int client){
 		g_iPendingSlays[client] -= 1;
 		ForcePlayerSuicide(client);
 		
-		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", client, g_iPendingSlays[i]);
+		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", client, g_iPendingSlays[client]);
 	}
 }
 
