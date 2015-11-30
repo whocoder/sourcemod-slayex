@@ -2,7 +2,7 @@
 {
 	"Pending slays left"
 	{
-		"#format"	"{1:s},{2:i}"
+		"#format"	"{1:N},{2:i}"
 		"en"		"Player {1} has been slayed. Remaining slays: {2}"
 	}
 	"Marked to slay"
