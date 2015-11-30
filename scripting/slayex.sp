@@ -33,7 +33,7 @@ public void OnPluginStart(){
 
 	RegAdminCmd("sm_slap", Command_Slap, ADMFLAG_SLAY, "sm_slap <#userid|name> [damage]");
 	RegAdminCmd("sm_slay", Command_Slay, ADMFLAG_SLAY, "sm_slay <#userid|name> [times]");
-	RegAdminCmd("sm_setslays", Command_SetSlays, ADMFLAG_SLAY, "sm_setslays <#userid|name> [amount]");
+	RegAdminCmd("sm_setslays", Command_SetSlays, ADMFLAG_SLAY, "sm_setslays <#userid|name> <amount>");
 	RegAdminCmd("sm_rename", Command_Rename, ADMFLAG_SLAY, "sm_rename <#userid|name>");
 	
 	/* Account for late loading */

@@ -140,6 +140,7 @@ public int MenuHandler_Slay2(Menu menu, MenuAction action, int param1, int param
 				times = 10;
 			
 			PerformSlay(param1, target, times);
+			ShowActivity2(param1, "[SM] ", "%t", "Marked to slay", "__n", target, times);
 		}
 		
 		DisplaySlayMenu(param1);
@@ -181,6 +182,8 @@ public Action Command_Slay(int client, int args)
 		if (StringToIntEx(arg2, times) == 0 || times < 0){
 			times = 1;
 		}
+	}else{
+		times = 1;
 	}
 	
 
