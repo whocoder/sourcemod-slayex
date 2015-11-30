@@ -28,7 +28,7 @@ void PerformSlay(int client, int target, int times=1){
 	
 	LogAction(client, target, "[SM] ", "%t", "Marked to slay by", "__n", target, times, "__n", client);
 
-	CheckSlays(client);
+	CheckSlays(target);
 }
 
 void DisplaySlayMenu(int client){
@@ -205,9 +205,9 @@ public Action Command_Slay(int client, int args)
 
 public Action Command_SetSlays(int client, int args)
 {
-	if (args < 1)
+	if (args < 2)
 	{
-		ReplyToCommand(client, "[SM] Usage: sm_setslays <#userid|name> [amount]");
+		ReplyToCommand(client, "[SM] Usage: sm_setslays <#userid|name> <amount>");
 		return Plugin_Handled;
 	}
 
@@ -232,12 +232,11 @@ public Action Command_SetSlays(int client, int args)
 	}
 	
 	int times = 0;
-	if (args > 1){
-		char arg2[20];
-		GetCmdArg(2, arg2, sizeof(arg2));
-		if (StringToIntEx(arg2, times) == 0 || times < 0){
-			times = 0;
-		}
+	
+	char arg2[20];
+	GetCmdArg(2, arg2, sizeof(arg2));
+	if (StringToIntEx(arg2, times) == 0 || times < 0){
+		times = 0;
 	}
 	
 
