@@ -21,13 +21,14 @@ install:
   - cd build-env
   - wget http://www.sourcemod.net/smdrop/$SOURCEMOD_MAJOR/sourcemod-$SOURCEMOD_MINOR-linux.tar.gz
   - tar -xzvf sourcemod-$SOURCEMOD_MINOR-linux.tar.gz
-  - cd addons/sourcemod/scripting
+  - cd addons/sourcemod/scripting/include
   - wget http://git.tf/TTT/Plugin/raw/master/addons/sourcemod/scripting/include/ttt.inc
+  - cd ../
   - find ./ -name "*.sp" -type f -delete
   - cd playercommands
   - wget https://raw.githubusercontent.com/alliedmodders/sourcemod/master/plugins/playercommands/slap.sp
   - wget https://raw.githubusercontent.com/alliedmodders/sourcemod/master/plugins/playercommands/rename.sp
-  - cd ../../../../
+  - cd ../../../../../
   - cp -rv $SCRIPTING/. build-env/addons/sourcemod/scripting/
   - cp -rv $SLAYEX/. build-env/addons/sourcemod/scripting/slayex
   - cp -rv $INCLUDE/. build-env/addons/sourcemod/scripting/include/
