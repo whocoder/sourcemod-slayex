@@ -2,17 +2,31 @@
 {
 	"Pending slays left"
 	{
-		"#format"	"{1:N},{2:i}"
+		"#format"	"{1:t},{2:i}"
 		"en"		"Player {1} has been slayed. Remaining slays: {2}"
 	}
 	"Marked to slay"
 	{
-		"#format"	"{1:s},{2:i}"
+		"#format"	"{1:t},{2:i}"
 		"en"		"Player {1} has been marked to be slain {2} time(s)."
 	}
 	"Marked to slay by"
 	{
-		"#format"	"{1:N},{2:i},{3:N}"
+		"#format"	"{1:t},{2:i},{3:t}"
 		"en"		"Player {1} has been marked to be slain {2} time(s) by {3}."
+	}
+	"Set slays to"
+	{
+		"#format"	"{1:t},{2:i}"
+		"en"		"Player {1} has had their slays set to {2}."
+	}
+	
+	
+	
+	
+	"__n"
+	{
+		"#format"	"{1:N}"
+		"en"		"{1}"
 	}
 }

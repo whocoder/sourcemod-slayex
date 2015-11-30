@@ -18,7 +18,7 @@ void CheckSlays(int client){
 		g_iPendingSlays[client] -= 1;
 		ForcePlayerSuicide(client);
 		
-		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", client, g_iPendingSlays[client]);
+		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", "__n", client, g_iPendingSlays[client]);
 	}
 }
 
@@ -26,7 +26,7 @@ void PerformSlay(int client, int target, int times=1){
 	g_iSelectedTarget[client] = 0;
 	g_iPendingSlays[target] += times;
 	
-	LogAction(client, target, "[SM] ", "%t", "Marked to slay by", "_s", target, times, client);
+	LogAction(client, target, "[SM] ", "%t", "Marked to slay by", "__n", target, times, "__n", client);
 
 	CheckSlays(client);
 }
@@ -136,11 +136,10 @@ public int MenuHandler_Slay2(Menu menu, MenuAction action, int param1, int param
 			menu.GetItem(param2, info, sizeof(info));
 			times = StringToInt(info);
 			
-			char name[MAX_NAME_LENGTH];
-			GetClientName(target, name, sizeof(name));
+			if(times > 10)
+				times = 10;
 			
 			PerformSlay(param1, target, times);
-			ShowActivity2(param1, "[SM] ", "%t", "Marked to slay", "_s", name, times);
 		}
 		
 		DisplaySlayMenu(param1);
@@ -196,6 +195,60 @@ public Action Command_Slay(int client, int args)
 	else
 	{
 		ShowActivity2(client, "[SM] ", "%t", "Marked to slay", "_s", target_name, times);
+	}
+
+	return Plugin_Handled;
+}
+
+public Action Command_SetSlays(int client, int args)
+{
+	if (args < 1)
+	{
+		ReplyToCommand(client, "[SM] Usage: sm_setslays <#userid|name> [amount]");
+		return Plugin_Handled;
+	}
+
+	char arg[65];
+	GetCmdArg(1, arg, sizeof(arg));
+
+	char target_name[MAX_TARGET_LENGTH];
+	int target_list[MAXPLAYERS]; int target_count; bool tn_is_ml;
+	
+	if ((target_count = ProcessTargetString(
+			arg,
+			client,
+			target_list,
+			MAXPLAYERS,
+			COMMAND_FILTER_NO_MULTI,
+			target_name,
+			sizeof(target_name),
+			tn_is_ml)) <= 0)
+	{
+		ReplyToTargetError(client, target_count);
+		return Plugin_Handled;
+	}
+	
+	int times = 0;
+	if (args > 1){
+		char arg2[20];
+		GetCmdArg(2, arg2, sizeof(arg2));
+		if (StringToIntEx(arg2, times) == 0 || times < 0){
+			times = 0;
+		}
+	}
+	
+
+	for (int i = 0; i < target_count; i++){
+		g_iPendingSlays[target_list[i]] = times;
+	}
+	
+	if (tn_is_ml)
+	{
+		ShowActivity2(client, "[SM] ", "%t", "Set slays to", target_name, times);
+	}
+	else
+	{
+		ShowActivity2(client, "[SM] ", "%t", "Set slays to", "_s", target_name, times);
 	}
 
 	return Plugin_Handled;
