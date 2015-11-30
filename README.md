@@ -1,4 +1,4 @@
-# Slay-Ex
+# Slay-Extended
 Modify playercommands with multiple slay support for Trouble in Terrorist Town.
 
 ## Requirements
@@ -6,8 +6,9 @@ Modify playercommands with multiple slay support for Trouble in Terrorist Town.
 
 ## Features
 * Builds automatically
-* Saves players slay amounts to SQLite
-* Modifies **Admin Menu** to allow specifying amount
+* Saves players amount of slays to SQLite
+* Slays player in TTT_OnRoundStart_Pre (before role is picked)
+* Modifies **Admin Menu** to allow specifying amount of slays
 
 ## Commands
 * **sm_slay** <#userid|name> [times] - Slay a player (default times is 1)
