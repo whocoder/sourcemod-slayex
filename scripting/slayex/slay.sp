@@ -5,12 +5,18 @@ int g_iPendingSlays[MAXPLAYERS+1];
 
 public void TTT_OnRoundStart_Pre(){
 	for(int i=1;i<=MaxClients;i++){
-		if(TTT_IsClientValid(i) && IsPlayerAlive(i) && (g_iPendingSlays[i] > 0)){
-			g_iPendingSlays[i] -= 1;
-			ForcePlayerSuicide(i);
-			
-			ShowActivity2(0, "[SM] ", "%t", "Pending slays left", target_name, g_iPendingSlays[i]);
+		if(TTT_IsClientValid(i)){
+			CheckSlays(client);
 		}
+	}
+}
+
+void CheckSlays(int client){
+	if(g_iPendingSlays[client] > 0 && IsPlayerAlive(client)){
+		g_iPendingSlays[client] -= 1;
+		ForcePlayerSuicide(client);
+		
+		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", target_name, g_iPendingSlays[i]);
 	}
 }
 
@@ -18,12 +24,9 @@ void PerformSlay(int client, int target, int times=1){
 	g_iSelectedTarget[client] = 0;
 	g_iPendingSlays[target] += times;
 	
-	LogAction(client, target, "\"%L\" marked \"%L\" to be slayed %i times", client, target, times);
-	
-	if(IsPlayerAlive(target)){
-		g_iPendingSlays[target] -= 1;
-		ForcePlayerSuicide(target);
-	}
+	LogAction(client, target, "[SM] ", "%t", "Marked to slay by", "_s", target, times, client);
+
+	CheckSlays(client);
 }
 
 void DisplaySlayMenu(int client){
