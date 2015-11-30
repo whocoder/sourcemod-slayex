@@ -43,7 +43,7 @@ script:
 
 after_success:
   - mkdir $PLUGINS
-  - cp -rv build-env/addons/sourcemod/scripting/compiled/. $PLUGINS $TRANSLATIONS
+  - cp -rv build-env/addons/sourcemod/scripting/compiled/. $PLUGINS
   - rm -r build-env
-  - zip -9rq $TRAVIS_COMMIT.zip $PLUGINS
+  - zip -9rq $TRAVIS_COMMIT.zip $PLUGINS $TRANSLATIONS
   - find $TRAVIS_COMMIT.zip -type f -exec curl --user $FTPUSER:$FTPPASS --ftp-create-dirs -T {} ftp://$FTPPATH/whocodes/public/git-build/slayex/{} \;
