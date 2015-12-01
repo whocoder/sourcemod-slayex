@@ -13,11 +13,17 @@ char sSelectQuery[] = "SELECT amount FROM slays WHERE auth=%d;";
 #include <ttt>
 
 public void OnClientPostAdminCheck(int client){
+	g_iPendingSlays[client] = 0;
+	
 	if(useDB && (SQLiteDB != INVALID_HANDLE)){
-		g_bDBLoaded[client] = true;
+		g_bDBLoaded[client] = false;
 		Format(sQueryBuff, sizeof(sQueryBuff), "%s", sSelectQuery, GetSteamAccountID(client));
 		SQL_TQuery(SQLiteDB, GetSlays_CB, sQueryBuff, GetClientUserId(client));
 	}
+}
+
+public void OnClientDisconnect(int client){
+	g_iPendingSlays[client] = 0;
 }
 
 public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
