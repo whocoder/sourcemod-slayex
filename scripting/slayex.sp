@@ -11,11 +11,13 @@
 #undef REQUIRE_PLUGIN
 #include <adminmenu>
 
+#define SLAYEX_VERSION "1.1"
+
 public Plugin myinfo = {
-	name = "Player Commands (Slay-Ex)",
+	name = "Player Commands (Slay-Extended)",
 	author = "AlliedModders LLC, whocodes",
 	description = "Misc. Player Commands (Extended)",
-	version = "1.0",
+	version = SLAYEX_VERSION,
 	url = "https://github.com/whocodes/slayex"
 };
 

@@ -68,6 +68,8 @@ public UpdateUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
 }
 
 void SetupSlayExDB(){
+	CreateConVar("slayex_version", SLAYEX_VERSION, "Version of Slay-Extended on server", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_DONTRECORD);
+	
 	char error[255];
 	SQLiteDB = SQLite_UseDatabase("slayex", error, sizeof(error));
 	
