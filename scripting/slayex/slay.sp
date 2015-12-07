@@ -6,9 +6,9 @@ Handle SQLiteDB;
 bool useDB = true;
 
 char sQueryBuff[1024];
-char sInsertQuery[] = "INSERT INTO slays (auth) VALUES (%d);";
-char sUpdateQuery[] = "UPDATE slays SET amount=%d WHERE auth=%d";
-char sSelectQuery[] = "SELECT amount FROM slays WHERE auth=%d;";
+char sInsertQuery[] = "INSERT INTO slays (auth) VALUES ('%d');";
+char sUpdateQuery[] = "UPDATE slays SET amount='%d' WHERE auth='%d';";
+char sSelectQuery[] = "SELECT amount FROM slays WHERE auth='%d';";
 
 #include <ttt>
 
@@ -77,7 +77,7 @@ void SetupSlayExDB(){
 		useDB = false;
 	else{
 		SQL_LockDatabase(SQLiteDB);
-		SQL_FastQuery(SQLiteDB, "CREATE TABLE IF NOT EXISTS slays (auth INT PRIMARY KEY NOT NULL, amount INTEGER DEFAULT 0);");
+		SQL_FastQuery(SQLiteDB, "CREATE TABLE IF NOT EXISTS slays (auth INT PRIMARY KEY NOT NULL, amount INT DEFAULT 0);");
 		SQL_UnlockDatabase(SQLiteDB);
 	}
 }
