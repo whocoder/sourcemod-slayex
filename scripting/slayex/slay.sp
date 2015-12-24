@@ -6,9 +6,6 @@ Handle SQLiteDB;
 bool useDB = true;
 
 char sQueryBuff[1024];
-char sInsertQuery[] = "INSERT INTO slays (auth) VALUES ('%d');";
-char sUpdateQuery[] = "UPDATE slays SET amount='%d' WHERE auth='%d';";
-char sSelectQuery[] = "SELECT amount FROM slays WHERE auth='%d';";
 
 #include <ttt>
 
@@ -17,7 +14,7 @@ public void OnClientPostAdminCheck(int client){
 
 	if(useDB && (SQLiteDB != INVALID_HANDLE)){
 		g_bDBLoaded[client] = false;
-		Format(sQueryBuff, sizeof(sQueryBuff), "%s", sSelectQuery, GetSteamAccountID(client));
+		Format(sQueryBuff, sizeof(sQueryBuff), "SELECT `amount` FROM `slays` WHERE auth=%d;", GetSteamAccountID(client));
 		SQL_TQuery(SQLiteDB, GetSlays_CB, sQueryBuff, GetClientUserId(client));
 	}
 }
@@ -39,7 +36,7 @@ public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
 			g_iPendingSlays[client] = SQL_FetchInt(hndl, 0);
 			CheckSlays(client);
 		}else{
-			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sInsertQuery, GetSteamAccountID(client));
+			Format(sQueryBuff, sizeof(sQueryBuff), "%s", "INSERT INTO `slays` (`auth`) VALUES (%d);", GetSteamAccountID(client));
 			SQL_TQuery(SQLiteDB, InsertUser_CB, sQueryBuff, GetClientUserId(client));
 		}
 	}
@@ -77,7 +74,7 @@ void SetupSlayExDB(){
 		useDB = false;
 	else{
 		SQL_LockDatabase(SQLiteDB);
-		SQL_FastQuery(SQLiteDB, "CREATE TABLE IF NOT EXISTS slays (auth INT PRIMARY KEY NOT NULL, amount INT DEFAULT 0);");
+		SQL_FastQuery(SQLiteDB, "CREATE TABLE IF NOT EXISTS `slays` (`auth` INT PRIMARY KEY NOT NULL, `amount` INT DEFAULT 0);");
 		SQL_UnlockDatabase(SQLiteDB);
 	}
 }
@@ -97,7 +94,7 @@ void CheckSlays(int client){
 		g_iPendingSlays[client] -= 1;
 
 		if(useDB && g_bDBLoaded[client] == true){
-			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sUpdateQuery, g_iPendingSlays[client], GetSteamAccountID(client));
+			Format(sQueryBuff, sizeof(sQueryBuff), "UPDATE `slays` SET `amount`=%d WHERE `auth`=%d;", g_iPendingSlays[client], GetSteamAccountID(client));
 			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientUserId(client));
 		}
 
