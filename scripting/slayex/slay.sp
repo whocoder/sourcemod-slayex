@@ -14,7 +14,7 @@ char sSelectQuery[] = "SELECT amount FROM slays WHERE auth='%d';";
 
 public void OnClientPostAdminCheck(int client){
 	g_iPendingSlays[client] = 0;
-	
+
 	if(useDB && (SQLiteDB != INVALID_HANDLE)){
 		g_bDBLoaded[client] = false;
 		Format(sQueryBuff, sizeof(sQueryBuff), "%s", sSelectQuery, GetSteamAccountID(client));
@@ -33,7 +33,7 @@ public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
 			LogMessage("Failed to retrieve slayex slays from database, error: %s", error);
 			return;
 		}
-		
+
 		if(SQL_FetchRow(hndl)){
 			g_bDBLoaded[client] = true;
 			g_iPendingSlays[client] = SQL_FetchInt(hndl, 0);
@@ -52,7 +52,7 @@ public InsertUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
 			LogMessage("Failed to insert slayex user into database, error: %s", error);
 			return;
 		}
-		
+
 		g_bDBLoaded[client] = true;
 	}
 }
@@ -69,10 +69,10 @@ public UpdateUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
 
 void SetupSlayExDB(){
 	CreateConVar("slayex_version", SLAYEX_VERSION, "Version of Slay-Extended on server", FCVAR_PLUGIN|FCVAR_NOTIFY|FCVAR_DONTRECORD);
-	
+
 	char error[255];
 	SQLiteDB = SQLite_UseDatabase("slayex", error, sizeof(error));
-	
+
 	if (SQLiteDB == INVALID_HANDLE)
 		useDB = false;
 	else{
@@ -88,29 +88,30 @@ public Action TTT_OnRoundStart_Pre(){
 			CheckSlays(i);
 		}
 	}
-	
+
 	return Plugin_Continue;
 }
 
 void CheckSlays(int client){
 	if(TTT_IsClientValid(client) && g_iPendingSlays[client] > 0 && IsPlayerAlive(client)){
 		g_iPendingSlays[client] -= 1;
-		
+
 		if(useDB && g_bDBLoaded[client] == true){
 			Format(sQueryBuff, sizeof(sQueryBuff), "%s", sUpdateQuery, g_iPendingSlays[client], GetSteamAccountID(client));
 			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientUserId(client));
 		}
-		
+
 		ForcePlayerSuicide(client);
-		
+
 		ShowActivity2(0, "[SM] ", "%t", "Pending slays left", "__n", client, g_iPendingSlays[client]);
+		PrintToChat(client, "%t", "You have been slain", client);
 	}
 }
 
 void PerformSlay(int client, int target, int times=1){
 	g_iSelectedTarget[client] = 0;
 	g_iPendingSlays[target] += times;
-	
+
 	LogAction(client, target, "[SM] ", "%t", "Marked to slay by", "__n", target, times, "__n", client);
 
 	CheckSlays(target);
@@ -119,18 +120,18 @@ void PerformSlay(int client, int target, int times=1){
 void DisplaySlayMenu(int client){
 	g_iSelectedTarget[client] = 0;
 	Menu menu = CreateMenu(MenuHandler_Slay);
-	
+
 	char title[100];
 	Format(title, sizeof(title), "%T:", "Slay player", client);
 	menu.SetTitle(title);
 	menu.ExitBackButton = true;
-	
+
 	AddTargetsToMenu(menu, client, true, true);
-	
+
 	menu.Display(client, MENU_TIME_FOREVER);
 }
 
-public AdminMenu_Slay(Handle topmenu, 
+public AdminMenu_Slay(Handle topmenu,
 					  TopMenuAction action,
 					  TopMenuObject object_id,
 					  int param,
@@ -159,7 +160,7 @@ public MenuHandler_Slay(Menu menu, MenuAction action, int param1, int param2){
 	{
 		char info[32];
 		int userid, target;
-		
+
 		menu.GetItem(param2, info, sizeof(info));
 		userid = StringToInt(info);
 
@@ -175,16 +176,16 @@ public MenuHandler_Slay(Menu menu, MenuAction action, int param1, int param2){
 		{
 			g_iSelectedTarget[param1] = userid;
 			Menu menu2 = CreateMenu(MenuHandler_Slay2);
-			
+
 			menu2.SetTitle("# of times");
 			menu2.ExitBackButton = true;
-			
+
 			menu2.AddItem("1", "1");
 			menu2.AddItem("2", "2");
 			menu2.AddItem("3", "3");
 			menu2.AddItem("4", "4");
 			menu2.AddItem("5", "5");
-			
+
 			menu2.Display(param1, MENU_TIME_FOREVER);
 		}
 	}
@@ -220,14 +221,14 @@ public int MenuHandler_Slay2(Menu menu, MenuAction action, int param1, int param
 		{
 			menu.GetItem(param2, info, sizeof(info));
 			times = StringToInt(info);
-			
+
 			if(times > 10)
 				times = 10;
-			
+
 			PerformSlay(param1, target, times);
 			ShowActivity2(param1, "[SM] ", "%t", "Marked to slay", "__n", target, times);
 		}
-		
+
 		DisplaySlayMenu(param1);
 	}
 }
@@ -245,7 +246,7 @@ public Action Command_Slay(int client, int args)
 
 	char target_name[MAX_TARGET_LENGTH];
 	int target_list[MAXPLAYERS]; int target_count; bool tn_is_ml;
-	
+
 	if ((target_count = ProcessTargetString(
 			arg,
 			client,
@@ -259,7 +260,7 @@ public Action Command_Slay(int client, int args)
 		ReplyToTargetError(client, target_count);
 		return Plugin_Handled;
 	}
-	
+
 	int times = 0;
 	if (args > 1){
 		char arg2[20];
@@ -270,12 +271,12 @@ public Action Command_Slay(int client, int args)
 	}else{
 		times = 1;
 	}
-	
+
 
 	for (int i = 0; i < target_count; i++){
 		PerformSlay(client, target_list[i], times);
 	}
-	
+
 	if (tn_is_ml)
 	{
 		ShowActivity2(client, "[SM] ", "%t", "Marked to slay", target_name, times);
@@ -301,7 +302,7 @@ public Action Command_SetSlays(int client, int args)
 
 	char target_name[MAX_TARGET_LENGTH];
 	int target_list[MAXPLAYERS]; int target_count; bool tn_is_ml;
-	
+
 	if ((target_count = ProcessTargetString(
 			arg,
 			client,
@@ -315,20 +316,20 @@ public Action Command_SetSlays(int client, int args)
 		ReplyToTargetError(client, target_count);
 		return Plugin_Handled;
 	}
-	
+
 	int times = 0;
-	
+
 	char arg2[20];
 	GetCmdArg(2, arg2, sizeof(arg2));
 	if (StringToIntEx(arg2, times) == 0 || times < 0){
 		times = 0;
 	}
-	
+
 
 	for (int i = 0; i < target_count; i++){
 		g_iPendingSlays[target_list[i]] = times;
 	}
-	
+
 	if (tn_is_ml)
 	{
 		ShowActivity2(client, "[SM] ", "%t", "Set slays to", target_name, times);

@@ -20,10 +20,13 @@
 		"#format"	"{1:t},{2:i}"
 		"en"		"Player {1} has had their slays set to {2}."
 	}
-	
-	
-	
-	
+
+	"You have been slain"
+	{
+		"en"		"You have been slain."
+	}
+
+
 	"__n"
 	{
 		"#format"	"{1:N}"
