@@ -1,6 +1,8 @@
 # Slay-Extended
 Modify playercommands with multiple slay support for Trouble in Terrorist Town.
 
+[![Build Status](https://travis-ci.org/whocodes/slayex.svg?branch=master)](https://travis-ci.org/whocodes/slayex)
+
 ## Requirements
 * Trouble in Terrorist Town (recent git)
 
