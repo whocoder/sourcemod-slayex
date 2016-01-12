@@ -15,7 +15,7 @@ public void OnClientPostAdminCheck(int client){
 	if(useDB && (SQLiteDB != INVALID_HANDLE)){
 		g_bDBLoaded[client] = false;
 		Format(sQueryBuff, sizeof(sQueryBuff), "SELECT `amount` FROM `slays` WHERE auth=%d;", GetSteamAccountID(client));
-		SQL_TQuery(SQLiteDB, GetSlays_CB, sQueryBuff, GetClientUserId(client));
+		SQL_TQuery(SQLiteDB, GetSlays_CB, sQueryBuff, GetClientSerial(client));
 	}
 }
 
@@ -24,7 +24,7 @@ public void OnClientDisconnect(int client){
 }
 
 public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
-	int client = GetClientOfUserId(userid);
+	int client = GetClientFromSerial(userid);
 	if(TTT_IsClientValid(client)){
 		if (hndl == INVALID_HANDLE || strlen(error) > 0){
 			LogMessage("Failed to retrieve slayex slays from database, error: %s", error);
@@ -36,14 +36,14 @@ public GetSlays_CB(Handle owner, Handle hndl, const char[] error, any userid){
 			g_iPendingSlays[client] = SQL_FetchInt(hndl, 0);
 			CheckSlays(client);
 		}else{
-			Format(sQueryBuff, sizeof(sQueryBuff), "%s", "INSERT INTO `slays` (`auth`) VALUES (%d);", GetSteamAccountID(client));
-			SQL_TQuery(SQLiteDB, InsertUser_CB, sQueryBuff, GetClientUserId(client));
+			Format(sQueryBuff, sizeof(sQueryBuff), "INSERT INTO `slays` (`auth`) VALUES (%d);", GetSteamAccountID(client));
+			SQL_TQuery(SQLiteDB, InsertUser_CB, sQueryBuff, GetClientSerial(client));
 		}
 	}
 }
 
 public InsertUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
-	int client = GetClientOfUserId(userid);
+	int client = GetClientFromSerial(userid);
 	if(TTT_IsClientValid(client)){
 		if (hndl == INVALID_HANDLE || strlen(error) > 0){
 			LogMessage("Failed to insert slayex user into database, error: %s", error);
@@ -55,7 +55,7 @@ public InsertUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
 }
 
 public UpdateUser_CB(Handle owner, Handle hndl, const char[] error, any userid){
-	int client = GetClientOfUserId(userid);
+	int client = GetClientFromSerial(userid);
 	if(TTT_IsClientValid(client)){
 		if (hndl == INVALID_HANDLE || strlen(error) > 0){
 			LogMessage("Failed to update slayex user in database, error: %s", error);
@@ -95,7 +95,7 @@ void CheckSlays(int client){
 
 		if(useDB && g_bDBLoaded[client] == true){
 			Format(sQueryBuff, sizeof(sQueryBuff), "UPDATE `slays` SET `amount`=%d WHERE `auth`=%d;", g_iPendingSlays[client], GetSteamAccountID(client));
-			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientUserId(client));
+			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientSerial(client));
 		}
 
 		ForcePlayerSuicide(client);
