@@ -325,6 +325,11 @@ public Action Command_SetSlays(int client, int args)
 
 	for (int i = 0; i < target_count; i++){
 		g_iPendingSlays[target_list[i]] = times;
+
+		if(useDB && g_bDBLoaded[target_list[i]] == true){
+			Format(sQueryBuff, sizeof(sQueryBuff), "UPDATE `slays` SET `amount`=%d WHERE `auth`=%d;", g_iPendingSlays[target_list[i]], GetSteamAccountID(target_list[i]));
+			SQL_TQuery(SQLiteDB, UpdateUser_CB, sQueryBuff, GetClientSerial(target_list[i]));
+		}
 	}
 
 	if (tn_is_ml)
